@@ -1,4 +1,4 @@
 kafka:
   clusters:
   - name: 'dev-cluster'
-    bootstrapServers: kafka:9092
+    bootstrapServers: broker:9092

@@ -1,9 +1,9 @@
 name: kafka
 services:
 
-  kafka:
+  broker:
     image: bitnami/kafka:latest
-    hostname: kafka
+    hostname: broker
     ports:
       - 9092:9092
     environment:
@@ -20,8 +20,7 @@ services:
     volumes:
       - ./kafka:/bitnami/kafka # persistent data
 
-  kafka-ui:
-    container_name: kafka-ui
+  ui:
     image: provectuslabs/kafka-ui:latest
     ports:
       - 8080:8080
@@ -29,3 +28,10 @@ services:
       DYNAMIC_CONFIG_ENABLED: 'true'
     volumes:
       - ./kui/config.yml:/etc/kafkaui/dynamic_config.yaml
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.14.88.0/29
