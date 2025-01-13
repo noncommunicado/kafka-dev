@@ -29,14 +29,56 @@ Script will replace `{{MY_IP}}` with **first** net-interface IP **automatically*
 
 ## Docker Compose file review
 
-Here presented default docker compose file.
-
 **Note! Change network address if host machine locates in the same subnet.**
 
-```yaml
+<details>
 
+<summary>Here presented default docker compose file</summary>
+
+```yaml
+name: kafka
+services:
+
+  broker:
+    image: bitnami/kafka:latest
+    hostname: broker
+    ports:
+      - 9092:9092
+    restart: unless-stopped
+    environment:
+      KAFKA_ENABLE_KRAFT: yes
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
+      KAFKA_CFG_NODE_ID: 0
+      KAFKA_CFG_PROCESS_ROLES: controller,broker
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 0@broker:9093
+      # replace with another IP or Host if need
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://{{MY_IP}}:9092
+    volumes:
+      - ./kafka:/bitnami/kafka # persistent data
+
+  ui:
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - 8080:8080
+    restart: unless-stopped
+    environment:
+      DYNAMIC_CONFIG_ENABLED: 'true'
+    volumes:
+      - ./kui/config.yaml:/etc/kafkaui/dynamic_config.yaml
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.14.88.0/29
 ```
 
+</details>
 
 ## Credits
 
